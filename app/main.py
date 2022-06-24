@@ -1,6 +1,6 @@
 from typing import Union
 
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, Form
 from pydantic import BaseModel, EmailStr
 
 app = FastAPI()
@@ -39,3 +39,7 @@ def fake_save_user(user_in: UserIn):
 async def create_user(user_in: UserIn):
     user_saved = fake_save_user(user_in)
     return user_saved
+
+@app.post("/login/")
+async def login(username: str = Form(), password: str = Form()):
+    return {"username": username}
