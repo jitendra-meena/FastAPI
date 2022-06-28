@@ -74,4 +74,6 @@ uvicorn main:app --reload
 
 ```
 
-# Jitendra Meena S
+```bash
+Jitendra Meena 
+```
