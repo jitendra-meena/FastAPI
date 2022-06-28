@@ -67,13 +67,11 @@ Alembic is a lightweight database migration tool for usage with the SQLAlchemy D
   ```
 
 # Run Server:
-```bash
->>To kickstart the app, use:
-```
+ To kickstart the app, use:
 
 ```bash
 uvicorn main:app --reload
 
 ```
 
-# Jitendra Meena Copyright ©2022
+# Jitendra Meena S
