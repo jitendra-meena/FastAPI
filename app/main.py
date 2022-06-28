@@ -1,45 +1,58 @@
-from typing import Union
+import uvicorn
+from fastapi import FastAPI
+from fastapi_sqlalchemy import DBSessionMiddleware, db
 
-from fastapi import FastAPI, status, Form
-from pydantic import BaseModel, EmailStr
+from schemas.schema import Book as SchemaBook
+from schemas.schema import Author as SchemaAuthor
+
+from schemas.schema import Book
+from schemas.schema import Author
+
+from models.models import Author as User
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv('.env')
+
 
 app = FastAPI()
 
+# to avoid csrftokenError
+app.add_middleware(DBSessionMiddleware, db_url='postgresql://postgres:postgres@localhost/FastAPIDB')
 
-class UserBase(BaseModel):
-    username: str
-    email: EmailStr
-    full_name: Union[str, None] = None
-
-
-class UserIn(UserBase):
-    password: str
+@app.get("/")
+async def root():
+    return {"message": "hello world"}
 
 
-class UserOut(UserBase):
-    pass
+@app.post('/book/', response_model=SchemaBook)
+async def book(book: SchemaBook):
+    db_book = ModelBook(title=book.title, rating=book.rating, author_id = book.author_id)
+    db.session.add(db_book)
+    db.session.commit()
+    return db_book
+
+@app.get('/book/')
+async def book():
+    book = db.session.query(ModelBook).all()
+    return book
 
 
-class UserInDB(UserBase):
-    hashed_password: str
+  
+@app.post('/author/', response_model=SchemaAuthor)
+async def author(author:SchemaAuthor):
+    db_author = ModelAuthor(name=author.name, age=author.age)
+    db.session.add(db_author)
+    db.session.commit()
+    return db_author
+
+@app.get('/author/')
+async def author():
+    author = db.session.query(ModelAuthor).all()
+    return author
 
 
-def fake_password_hasher(raw_password: str):
-    return "supersecret" + raw_password
-
-
-def fake_save_user(user_in: UserIn):
-    hashed_password = fake_password_hasher(user_in.password)
-    user_in_db = UserInDB(**user_in.dict(), hashed_password=hashed_password)
-    print("User saved! ..not really")
-    return user_in_db
-
-
-@app.post("/user/", response_model=UserOut,status_code=status.HTTP_201_CREATED)
-async def create_user(user_in: UserIn):
-    user_saved = fake_save_user(user_in)
-    return user_saved
-
-@app.post("/login/")
-async def login(username: str = Form(), password: str = Form()):
-    return {"username": username}
+# To run locally
+if __name__ == '__main__':
+    uvicorn.run(app, host='0.0.0.0', port=8000)
