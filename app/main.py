@@ -8,7 +8,8 @@ from schemas.schema import Author as SchemaAuthor
 from schemas.schema import Book
 from schemas.schema import Author
 
-from models.models import Author as User
+from models.models import Book as ModelBook
+from models.models import Author as ModelAuthor
 
 import os
 from dotenv import load_dotenv
