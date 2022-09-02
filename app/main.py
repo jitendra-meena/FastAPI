@@ -24,7 +24,7 @@ app.add_middleware(DBSessionMiddleware, db_url='postgresql://postgres:postgres@l
 
 @app.get("/")
 async def root():
-    return {"message": "hello world"}
+    return {"message": "CICD Implementation"}
 
 
 @app.post('/book/', response_model=SchemaBook)
